@@ -12,7 +12,7 @@ from multiprocessing import Value
 import decord
 from decord import VideoReader
 from decord import cpu, gpu
-# decord.bridge.set_bridge('torch')
+decord.bridge.set_bridge('torch')
 
 import numpy as np
 import pandas as pd
@@ -54,12 +54,12 @@ class CsvDataset(Dataset):
 
 class CsvVideoDataset(Dataset):
     def __init__(self, input_filename, transforms, dataset_root_folder,
-                 vid_key="videoid", caption_key="name", sep=",",
+                 img_key="videoid", caption_key="name", sep=",",
                  tokenizer=None, max_seq_len=16):
         logging.debug(f'Loading csv data from {input_filename}.')
         df = pd.read_csv(input_filename, sep=sep)
 
-        self.videos = df[vid_key].tolist()
+        self.videos = df[img_key].tolist()
         self.captions = df[caption_key].tolist()
         self.transforms = transforms
         logging.debug('Done loading data.')
@@ -75,10 +75,7 @@ class CsvVideoDataset(Dataset):
     def __getitem__(self, idx):
         vr = VideoReader(os.path.join(self.dataset_root_folder, self.page_dirs[idx], str(self.videos[idx]) + ".mp4"))
         frame_length = len(vr)
-        frames = vr.get_batch(np.linspace(0, frame_length - 1, self.max_seq_len, dtype=np.int32)).asnumpy()
-        print(frames.shape)
-        frames = Image.fromarray(frames)
-
+        frames = vr.get_batch(np.linspace(0, frame_length - 1, self.max_seq_len, dtype=np.int32))
         images = self.transforms(frames)
         texts = self.tokenize([str(self.captions[idx])])[0]
         return images, texts

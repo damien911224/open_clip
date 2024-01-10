@@ -10,14 +10,15 @@ from typing import Any, Dict, Optional, Tuple, Union
 import torch
 
 from .constants import OPENAI_DATASET_MEAN, OPENAI_DATASET_STD
-from .model import CLIP, CustomTextCLIP, convert_weights_to_lp, convert_to_custom_text_state_dict,\
+from .model import CLIP, VideoCLIP, CustomTextCLIP, convert_weights_to_lp, convert_to_custom_text_state_dict,\
     resize_pos_embed, get_cast_dtype, resize_text_pos_embed, set_model_preprocess_cfg
 from .coca_model import CoCa
 from .loss import ClipLoss, DistillClipLoss, CoCaLoss, SigLipLoss
 from .openai import load_openai_model
 from .pretrained import is_pretrained_cfg, get_pretrained_cfg, download_pretrained,\
     list_pretrained_tags_by_model, download_pretrained_from_hf
-from .transform import image_transform_v2, AugmentationCfg, PreprocessCfg, merge_preprocess_dict, merge_preprocess_kwargs
+from .transform import image_transform_v2, video_transform_v2, \
+    AugmentationCfg, PreprocessCfg, merge_preprocess_dict, merge_preprocess_kwargs
 from .tokenizer import HFTokenizer, SimpleTokenizer, DEFAULT_CONTEXT_LENGTH
 
 HF_HUB_PREFIX = 'hf-hub:'
@@ -164,6 +165,7 @@ def load_checkpoint(model, checkpoint_path, strict=True):
 
 def create_model(
         model_name: str,
+        data_type: Optional[str] = "images",
         pretrained: Optional[str] = None,
         precision: str = 'fp32',
         device: Union[str, torch.device] = 'cpu',
@@ -249,7 +251,12 @@ def create_model(
             else:
                 model = CustomTextCLIP(**model_cfg, cast_dtype=cast_dtype)
         else:
-            model = CLIP(**model_cfg, cast_dtype=cast_dtype)
+            if data_type == "images":
+                model = CLIP(**model_cfg, cast_dtype=cast_dtype)
+            elif data_type == "videos":
+                model = VideoCLIP(**model_cfg, cast_dtype=cast_dtype)
+            else:
+                raise RuntimeError(f'Data type for {data_type} not found.')
 
         if precision in ("fp16", "bf16"):
             dtype = torch.float16 if 'fp16' in precision else torch.bfloat16
@@ -359,6 +366,7 @@ def create_loss(args):
 
 def create_model_and_transforms(
         model_name: str,
+        data_type: Optinal[str] = "images",
         pretrained: Optional[str] = None,
         precision: str = 'fp32',
         device: Union[str, torch.device] = 'cpu',
@@ -384,6 +392,7 @@ def create_model_and_transforms(
     model = create_model(
         model_name,
         pretrained,
+        data_type=data_type,
         precision=precision,
         device=device,
         jit=jit,
@@ -401,15 +410,28 @@ def create_model_and_transforms(
 
     pp_cfg = PreprocessCfg(**model.visual.preprocess_cfg)
 
-    preprocess_train = image_transform_v2(
-        pp_cfg,
-        is_train=True,
-        aug_cfg=aug_cfg,
-    )
-    preprocess_val = image_transform_v2(
-        pp_cfg,
-        is_train=False,
-    )
+    if data_type == "images":
+        preprocess_train = image_transform_v2(
+            pp_cfg,
+            is_train=True,
+            aug_cfg=aug_cfg,
+        )
+        preprocess_val = image_transform_v2(
+            pp_cfg,
+            is_train=False,
+        )
+    elif data_type == "videos":
+        preprocess_train = video_transform_v2(
+            pp_cfg,
+            is_train=True,
+            aug_cfg=aug_cfg,
+        )
+        preprocess_val = video_transform_v2(
+            pp_cfg,
+            is_train=False,
+        )
+    else:
+        raise RuntimeError(f'Data type for {data_type} not found.')
 
     return model, preprocess_train, preprocess_val
 

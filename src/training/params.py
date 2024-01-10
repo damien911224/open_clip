@@ -72,6 +72,12 @@ def parse_args(args):
         help="Which type of dataset to process."
     )
     parser.add_argument(
+        "--data-type",
+        choices=["images", "videos"],
+        default="images",
+        help="Which type of data to process."
+    )
+    parser.add_argument(
         "--dataset-resampled",
         default=False,
         action="store_true",
@@ -85,12 +91,6 @@ def parse_args(args):
     )
     parser.add_argument(
         "--csv-img-key",
-        type=str,
-        default="filepath",
-        help="For csv-like datasets, the name of the key for the image paths."
-    )
-    parser.add_argument(
-        "--csv-vid-key",
         type=str,
         default="filepath",
         help="For csv-like datasets, the name of the key for the image paths."

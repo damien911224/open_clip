@@ -222,6 +222,7 @@ def main(args):
         model_kwargs['init_logit_bias'] = -10
     model, preprocess_train, preprocess_val = create_model_and_transforms(
         args.model,
+        args.data_type,
         args.pretrained,
         precision=args.precision,
         device=device,

@@ -5,9 +5,11 @@ from dataclasses import dataclass, asdict
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import torch
+import torchvision
 import torchvision.transforms.functional as F
 from torchvision.transforms import Normalize, Compose, RandomResizedCrop, InterpolationMode, ToTensor, Resize, \
     CenterCrop, ColorJitter, Grayscale
+import pytorchvideo
 
 from .constants import OPENAI_DATASET_MEAN, OPENAI_DATASET_STD
 from .utils import to_2tuple
@@ -390,12 +392,93 @@ def image_transform(
         return Compose(transforms)
 
 
+def video_transform(
+        image_size: Union[int, Tuple[int, int]],
+        is_train: bool,
+        mean: Optional[Tuple[float, ...]] = None,
+        std: Optional[Tuple[float, ...]] = None,
+        resize_mode: Optional[str] = None,
+        interpolation: Optional[str] = None,
+        fill_color: int = 0,
+        aug_cfg: Optional[Union[Dict[str, Any], AugmentationCfg]] = None,
+):
+    mean = mean or OPENAI_DATASET_MEAN
+    if not isinstance(mean, (list, tuple)):
+        mean = (mean,) * 3
+
+    std = std or OPENAI_DATASET_STD
+    if not isinstance(std, (list, tuple)):
+        std = (std,) * 3
+
+    interpolation = interpolation or 'bicubic'
+    assert interpolation in ['bicubic', 'bilinear', 'nearest', 'area']
+    # NOTE random is ignored for interpolation_mode, so defaults to BICUBIC for inference if set
+    interpolation_mode = interpolation
+
+    resize_mode = resize_mode or 'shortest'
+    assert resize_mode in ('shortest', 'longest', 'squash')
+
+    if isinstance(aug_cfg, dict):
+        aug_cfg = AugmentationCfg(**aug_cfg)
+    else:
+        aug_cfg = aug_cfg or AugmentationCfg()
+
+    normalize = pytorchvideo.transforms.Normalize(mean=mean, std=std)
+
+    if is_train:
+        aug_cfg_dict = {k: v for k, v in asdict(aug_cfg).items() if v is not None}
+        train_transform = [
+            pytorchvideo.transforms.RandomResizedCrop(
+                image_size[0],
+                image_size[1],
+                scale=aug_cfg_dict.pop('scale'),
+                interpolation=interpolation_mode,
+            )
+        ]
+        train_transform.extend([
+            pytorchvideo.transforms.Div255(),
+            normalize,
+        ])
+        train_transform = Compose(train_transform)
+        if aug_cfg_dict:
+            warnings.warn(f'Unused augmentation cfg items, specify `use_timm` to use ({list(aug_cfg_dict.keys())}).')
+        return train_transform
+    else:
+        assert resize_mode == 'shortest'
+        if not isinstance(image_size, (tuple, list)):
+            image_size = (image_size, image_size)
+        transforms = [
+            pytorchvideo.transforms.ShortSideScale(min(image_size)),
+            torchvision.transforms._transforms_video.CenterCropVideo(min(image_size)),
+            pytorchvideo.transforms.Div255(),
+            normalize,
+        ]
+
+        return Compose(transforms)
+
+
 def image_transform_v2(
         cfg: PreprocessCfg,
         is_train: bool,
         aug_cfg: Optional[Union[Dict[str, Any], AugmentationCfg]] = None,
 ):
     return image_transform(
+        image_size=cfg.size,
+        is_train=is_train,
+        mean=cfg.mean,
+        std=cfg.std,
+        interpolation=cfg.interpolation,
+        resize_mode=cfg.resize_mode,
+        fill_color=cfg.fill_color,
+        aug_cfg=aug_cfg,
+    )
+
+def video_transform_v2(
+        cfg: PreprocessCfg,
+        is_train: bool,
+        aug_cfg: Optional[Union[Dict[str, Any], AugmentationCfg]] = None,
+):
+    return video_transform(
         image_size=cfg.size,
         is_train=is_train,
         mean=cfg.mean,
