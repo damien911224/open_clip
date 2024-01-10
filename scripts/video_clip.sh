@@ -18,7 +18,7 @@ torchrun --nproc_per_node=4 \
     --epochs=30 \
     --seed 0 \
     --warmup 10000 \
-    --train-num-samples 829298 \
+    --train-num-samples 829103 \
     --dataset-type csv_video \
     --data-type "videos" \
     --batch-size 32 \
