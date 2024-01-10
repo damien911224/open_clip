@@ -11,7 +11,7 @@ from torchvision.transforms import Normalize, Compose, RandomResizedCrop, Interp
     CenterCrop, ColorJitter, Grayscale
 from pytorchvideo.transforms import Normalize as NormalizeVideo
 from pytorchvideo.transforms import RandomResizedCrop as RandomResizedCropVideo
-from pytorchvideo.transforms import Div255, ShortSideScale
+from pytorchvideo.transforms import Div255, ShortSideScale, ConvertUint8ToFloat
 from torchvision.transforms._transforms_video import CenterCropVideo
 
 from .constants import OPENAI_DATASET_MEAN, OPENAI_DATASET_STD
@@ -433,6 +433,7 @@ def video_transform(
     if is_train:
         aug_cfg_dict = {k: v for k, v in asdict(aug_cfg).items() if v is not None}
         train_transform = [
+            ConvertUint8ToFloat(),
             Div255(),
             RandomResizedCropVideo(
                 image_size[0],
@@ -452,6 +453,7 @@ def video_transform(
     else:
         assert resize_mode == 'shortest'
         transforms = [
+            ConvertUint8ToFloat(),
             Div255(),
             ShortSideScale(min(image_size)),
             CenterCropVideo(min(image_size)),
