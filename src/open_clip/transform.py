@@ -433,6 +433,7 @@ def video_transform(
     if is_train:
         aug_cfg_dict = {k: v for k, v in asdict(aug_cfg).items() if v is not None}
         train_transform = [
+            Div255(),
             RandomResizedCropVideo(
                 image_size[0],
                 image_size[1],
@@ -442,7 +443,6 @@ def video_transform(
             )
         ]
         train_transform.extend([
-            Div255(),
             normalize,
         ])
         train_transform = Compose(train_transform)
@@ -452,9 +452,9 @@ def video_transform(
     else:
         assert resize_mode == 'shortest'
         transforms = [
+            Div255(),
             ShortSideScale(min(image_size)),
             CenterCropVideo(min(image_size)),
-            Div255(),
             normalize,
         ]
 
