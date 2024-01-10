@@ -484,7 +484,7 @@ class VideoCLIP(nn.Module):
     ):
         N, C, T, H, W = video.shape
         video = video.transpose(1, 2).flatten(0, 1)
-        image_features = self.encode_image(video, normalize=False) if video is not None else None
+        image_features = self.encode_video(video, normalize=False) if video is not None else None
         print(image_features.shape)
         exit()
         image_features = image_features.view(N, T, -1)
