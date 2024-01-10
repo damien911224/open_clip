@@ -65,6 +65,7 @@ class CsvVideoDataset(Dataset):
                                                str(pd_item[img_key]) + ".mp4")):
                 to_be_removed.append(i)
         print(len(df))
+        print(len(to_be_removed))
         df.drop(to_be_removed)
         print(len(df))
         exit()
