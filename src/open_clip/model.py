@@ -445,8 +445,8 @@ class VideoCLIP(nn.Module):
         self.visual.set_grad_checkpointing(enable)
         self.transformer.grad_checkpointing = enable
 
-    def encode_image(self, image, normalize: bool = False):
-        features = self.visual(image)
+    def encode_video(self, video, normalize: bool = False):
+        features = self.visual(video)
         return F.normalize(features, dim=-1) if normalize else features
 
     def encode_text(self, text, normalize: bool = False):
@@ -479,11 +479,13 @@ class VideoCLIP(nn.Module):
 
     def forward(
             self,
-            image: Optional[torch.Tensor] = None,
+            video: Optional[torch.Tensor] = None,
             text: Optional[torch.Tensor] = None,
     ):
-        N, C, T, H, W = image.shape
-        image = image.view(N * T, C, H, W)
+        print(video.shape)
+        exit()
+        N, C, T, H, W = video.shape
+        video = video.transpose(1, 2).view(N * T, C, H, W)
         print(image.shape)
         image_features = self.encode_image(image, normalize=False) if image is not None else None
         image_features = image_features.view(N, T, -1)
