@@ -15,8 +15,8 @@ torchrun --nproc_per_node=4 \
     --wd=0.1 \
     --seed 0 \
     --warmup 10000 \
-    --train-num-samples 10968539 \
+    --train-num-samples 829298 \
     --dataset-type csv_video \
     --batch-size 32 \
     --precision amp \
-    --workers 16 \
+    --workers 16
