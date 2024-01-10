@@ -552,10 +552,6 @@ class VideoCLIP(CLIP):
 
         text_features = self.encode_text(text, normalize=True) if text is not None else None
 
-        print(image_features.shape)
-        print(text_features.shape)
-        exit()
-
         if self.output_dict:
             out_dict = {
                 "image_features": image_features,
