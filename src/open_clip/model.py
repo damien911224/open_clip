@@ -482,8 +482,6 @@ class VideoCLIP(nn.Module):
             video: Optional[torch.Tensor] = None,
             text: Optional[torch.Tensor] = None,
     ):
-        print(video.shape)
-        exit()
         N, C, T, H, W = video.shape
         video = video.transpose(1, 2).view(N * T, C, H, W)
         print(image.shape)
