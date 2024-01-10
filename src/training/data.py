@@ -82,7 +82,7 @@ class CsvVideoDataset(Dataset):
         return len(self.captions)
 
     def __getitem__(self, idx):
-        video_path = os.path.join(self.dataset_root_folder, self.page_dirs[idx], str(self.videos[idx]) + ".mp4")
+        video_path = os.path.join(self.dataset_root_folder, str(self.page_dirs[idx]), str(self.videos[idx]) + ".mp4")
         while True:
             try:
                 vr = VideoReader(video_path)
