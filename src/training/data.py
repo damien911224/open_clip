@@ -68,8 +68,6 @@ class CsvVideoDataset(Dataset):
         df.drop(index=to_be_removed)
 
         self.videos = df[img_key].tolist()
-        print(len(self.videos))
-        exit()
         self.captions = df[caption_key].tolist()
         self.transforms = transforms
         logging.debug('Done loading data.')
