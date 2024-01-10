@@ -246,6 +246,10 @@ class CLIP(nn.Module):
         self.text_projection = text.text_projection
         self.text_pool_type = text.pool_type
         self.register_buffer('attn_mask', text.attn_mask, persistent=False)
+        self.aggregation_layer = nn.TransformerEncoderLayer(d_model=embed_dim, nhead=8)
+        self.embedding_token = nn.Parameter(torch.empty(1, embed_dim))
+        self.temporal_positional_embedding = nn.Parameter(torch.empty(768, embed_dim))
+        nn.init.normal_(self.temporal_positional_embedding, std=0.01)
 
         self.logit_scale = nn.Parameter(torch.ones([]) * init_logit_scale)
         if init_logit_bias is not None:
@@ -299,7 +303,18 @@ class CLIP(nn.Module):
             image: Optional[torch.Tensor] = None,
             text: Optional[torch.Tensor] = None,
     ):
-        image_features = self.encode_image(image, normalize=True) if image is not None else None
+        N, C, T, H, W = image.shape
+        image = image.transpose(1, 2).view(N * T, C, H, W)
+        image_features = self.encode_image(image, normalize=False) if image is not None else None
+        image_features = image_features.view(N, T, -1).transpose(1, 2)
+
+        pos_embeds = self.temporal_positional_embedding.unsqueeze(0).transpose(1, 2)
+        embedding_token = self.embedding_token.unsqueeze(0).transpose(1, 2)
+        image_features = torch.cat((image_features + pos_embeds, embedding_token), dim=2)
+
+        image_features = self.aggregation_layer(image_features)[-1]
+        image_features = F.normalize(image_features, dim=-1)
+
         text_features = self.encode_text(text, normalize=True) if text is not None else None
 
         if self.output_dict:

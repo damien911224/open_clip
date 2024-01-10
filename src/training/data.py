@@ -9,6 +9,9 @@ import braceexpand
 from dataclasses import dataclass
 from multiprocessing import Value
 
+from decord import VideoReader
+from decord import cpu, gpu
+
 import numpy as np
 import pandas as pd
 import torch
@@ -43,6 +46,38 @@ class CsvDataset(Dataset):
 
     def __getitem__(self, idx):
         images = self.transforms(Image.open(str(self.images[idx])))
+        texts = self.tokenize([str(self.captions[idx])])[0]
+        return images, texts
+
+
+class CsvVideoDataset(Dataset):
+    def __init__(self, input_filename, transforms, dataset_root_folder,
+                 vid_key="videoid", caption_key="name", sep=",",
+                 tokenizer=None, frame_len=768):
+        logging.debug(f'Loading csv data from {input_filename}.')
+        df = pd.read_csv(input_filename, sep=sep)
+
+        self.videos = df[vid_key].tolist()
+        self.captions = df[caption_key].tolist()
+        self.transforms = transforms
+        logging.debug('Done loading data.')
+
+        self.tokenize = tokenizer
+        self.page_dirs = df["page_dir"].tolist()
+        self.frame_len = frame_len
+        self.dataset_root_folder = dataset_root_folder
+
+    def __len__(self):
+        return len(self.captions)
+
+    def __getitem__(self, idx):
+        vr = VideoReader(os.path.join(self.dataset_root_folder, self.page_dirs[idx], str(self.videos[idx]) + ".mp4"),
+                         ctx=cpu(0))
+        frame_length = len(vr)
+
+        frames = vr.get_batch(np.linspace(0, frame_length - 1, self.frame_len, dtype=np.int32))
+
+        images = self.transforms(frames)
         texts = self.tokenize([str(self.captions[idx])])[0]
         return images, texts
 
@@ -472,6 +507,36 @@ def get_csv_dataset(args, preprocess_fn, is_train, epoch=0, tokenizer=None):
 
     return DataInfo(dataloader, sampler)
 
+def get_csv_video_dataset(args, preprocess_fn, is_train, epoch=0, tokenizer=None):
+    input_filename = args.train_data if is_train else args.val_data
+    assert input_filename
+    dataset = CsvVideoDataset(
+        input_filename,
+        preprocess_fn,
+        args.dataset_root_folder,
+        img_key=args.csv_vid_key,
+        caption_key=args.csv_caption_key,
+        sep=args.csv_separator,
+        tokenizer=tokenizer
+    )
+    num_samples = len(dataset)
+    sampler = DistributedSampler(dataset) if args.distributed and is_train else None
+    shuffle = is_train and sampler is None
+
+    dataloader = DataLoader(
+        dataset,
+        batch_size=args.batch_size,
+        shuffle=shuffle,
+        num_workers=args.workers,
+        pin_memory=True,
+        sampler=sampler,
+        drop_last=is_train,
+    )
+    dataloader.num_samples = num_samples
+    dataloader.num_batches = len(dataloader)
+
+    return DataInfo(dataloader, sampler)
+
 
 class SyntheticDataset(Dataset):
 
@@ -528,6 +593,8 @@ def get_dataset_fn(data_path, dataset_type):
         return get_wds_dataset
     elif dataset_type == "csv":
         return get_csv_dataset
+    elif dataset_type == "csv_video":
+        return get_csv_video_dataset()
     elif dataset_type == "synthetic":
         return get_synthetic_dataset
     elif dataset_type == "auto":

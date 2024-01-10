@@ -48,6 +48,12 @@ def parse_args(args):
         help="Path to file(s) with validation data",
     )
     parser.add_argument(
+        "--dataset-root-folder",
+        type=str,
+        default=None,
+        help="Path to the dataset folder",
+    )
+    parser.add_argument(
         "--train-num-samples",
         type=int,
         default=None,
@@ -61,7 +67,7 @@ def parse_args(args):
     )
     parser.add_argument(
         "--dataset-type",
-        choices=["webdataset", "csv", "synthetic", "auto"],
+        choices=["webdataset", "csv", "csv_video", "synthetic", "auto"],
         default="auto",
         help="Which type of dataset to process."
     )
