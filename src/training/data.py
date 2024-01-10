@@ -72,8 +72,7 @@ class CsvVideoDataset(Dataset):
         return len(self.captions)
 
     def __getitem__(self, idx):
-        vr = VideoReader(os.path.join(self.dataset_root_folder, self.page_dirs[idx], str(self.videos[idx]) + ".mp4"),
-                         ctx=cpu(0))
+        vr = VideoReader(os.path.join(self.dataset_root_folder, self.page_dirs[idx], str(self.videos[idx]) + ".mp4"))
         frame_length = len(vr)
         frames = vr.get_batch(np.linspace(0, frame_length - 1, self.frame_len, dtype=np.int32))
 
