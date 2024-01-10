@@ -77,8 +77,6 @@ class CsvVideoDataset(Dataset):
         frame_length = len(vr)
         frames = vr.get_batch(np.linspace(0, frame_length - 1, self.max_seq_len, dtype=np.int32)).permute(3, 0, 1, 2)
         images = self.transforms(frames)
-        print(images.shape)
-        exit()
         texts = self.tokenize([str(self.captions[idx])])[0]
         return images, texts
 
