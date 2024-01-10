@@ -95,8 +95,6 @@ def train_one_epoch(model, data, loss, epoch, optimizer, scaler, scheduler, dist
 
         data_time_m.update(time.time() - end)
         optimizer.zero_grad()
-        print(images.shape)
-        exit()
         if args.accum_freq == 1:
             with autocast():
                 model_out = model(images, texts)

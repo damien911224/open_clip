@@ -482,10 +482,11 @@ class VideoCLIP(nn.Module):
             video: Optional[torch.Tensor] = None,
             text: Optional[torch.Tensor] = None,
     ):
+        print(video.shape)
+        exit()
         N, C, T, H, W = video.shape
         video = video.transpose(1, 2).view(N * T, C, H, W)
-        print(image.shape)
-        image_features = self.encode_image(image, normalize=False) if image is not None else None
+        image_features = self.encode_image(video, normalize=False) if video is not None else None
         image_features = image_features.view(N, T, -1)
 
         pos_embeds = self.temporal_positional_embedding.unsqueeze(0)
@@ -493,7 +494,6 @@ class VideoCLIP(nn.Module):
         image_features = torch.cat((image_features + pos_embeds, embedding_token), dim=1)
 
         image_features = self.aggregation_layer(image_features)[:, -1]
-        print(image_features.shape)
         image_features = F.normalize(image_features, dim=-1)
 
         text_features = self.encode_text(text, normalize=True) if text is not None else None
