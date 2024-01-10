@@ -21,7 +21,7 @@ torchrun --nproc_per_node=4 \
     --train-num-samples 829103 \
     --dataset-type csv_video \
     --data-type "videos" \
-    --batch-size 32 \
+    --batch-size 16 \
     --max-seq-len 16 \
     --precision amp \
     --workers 16
