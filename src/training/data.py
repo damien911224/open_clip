@@ -64,11 +64,8 @@ class CsvVideoDataset(Dataset):
             if not os.path.exists(os.path.join(dataset_root_folder, str(pd_item["page_dir"]),
                                                str(pd_item[img_key]) + ".mp4")):
                 to_be_removed.append(i)
-        print(len(df))
-        print(len(to_be_removed))
+        
         df = df.drop(to_be_removed)
-        print(len(df))
-        exit()
 
         self.videos = df[img_key].tolist()
         self.captions = df[caption_key].tolist()
