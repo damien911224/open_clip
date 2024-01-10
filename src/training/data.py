@@ -11,6 +11,7 @@ from multiprocessing import Value
 
 from decord import VideoReader
 from decord import cpu, gpu
+decord.bridge.set_bridge('torch')
 
 import numpy as np
 import pandas as pd
@@ -74,7 +75,6 @@ class CsvVideoDataset(Dataset):
         vr = VideoReader(os.path.join(self.dataset_root_folder, self.page_dirs[idx], str(self.videos[idx]) + ".mp4"),
                          ctx=cpu(0))
         frame_length = len(vr)
-
         frames = vr.get_batch(np.linspace(0, frame_length - 1, self.frame_len, dtype=np.int32))
 
         images = self.transforms(frames)
