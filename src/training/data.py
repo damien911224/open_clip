@@ -514,9 +514,8 @@ def get_csv_video_dataset(args, preprocess_fn, is_train, epoch=0, tokenizer=None
         input_filename,
         preprocess_fn,
         args.dataset_root_folder,
-        img_key=args.csv_vid_key,
+        vid_key=args.csv_vid_key,
         caption_key=args.csv_caption_key,
-        sep=args.csv_separator,
         tokenizer=tokenizer
     )
     num_samples = len(dataset)
