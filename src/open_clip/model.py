@@ -485,6 +485,8 @@ class VideoCLIP(nn.Module):
         N, C, T, H, W = video.shape
         video = video.transpose(1, 2).view(N * T, C, H, W)
         image_features = self.encode_image(video, normalize=False) if video is not None else None
+        print(image_features.shape)
+        exit()
         image_features = image_features.view(N, T, -1)
 
         pos_embeds = self.temporal_positional_embedding.unsqueeze(0)
