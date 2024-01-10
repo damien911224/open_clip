@@ -61,7 +61,7 @@ class CsvVideoDataset(Dataset):
 
         to_be_removed = list()
         for i, pd_item in df.iterrows():
-            if not os.path.exists(os.path.join(dataset_root_folder, pd_item["page_dir"], pd_item[img_key] + ".mp4")):
+            if not os.path.exists(os.path.join(dataset_root_folder, pd_item["page_dir"], str(pd_item[img_key]) + ".mp4")):
                 to_be_removed.append(i)
 
         print(len(to_be_removed))
