@@ -488,7 +488,7 @@ class VideoCLIP(nn.Module):
         image_features = image_features.view(N, T, -1)
 
         pos_embeds = self.temporal_positional_embedding.unsqueeze(0)
-        embedding_token = self.embedding_token.unsqueeze(0)
+        embedding_token = self.embedding_token.unsqueeze(0).repeat(N, 1, 1)
         image_features = torch.cat((image_features + pos_embeds, embedding_token), dim=1)
         print(image_features.shape)
 

@@ -220,7 +220,7 @@ def main(args):
     if args.siglip:
         model_kwargs['init_logit_scale'] = np.log(10)  # different from CLIP
         model_kwargs['init_logit_bias'] = -10
-    if args.data_type == "videos":
+    if args.data_type == 'videos':
         model_kwargs['max_seq_len'] = args.max_seq_len
     model, preprocess_train, preprocess_val = create_model_and_transforms(
         args.model,
