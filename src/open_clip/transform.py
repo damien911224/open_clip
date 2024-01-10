@@ -429,6 +429,8 @@ def video_transform(
     normalize = NormalizeVideo(mean=mean, std=std)
 
     if is_train:
+        if not isinstance(image_size, (tuple, list)):
+            image_size = (image_size, image_size)
         aug_cfg_dict = {k: v for k, v in asdict(aug_cfg).items() if v is not None}
         train_transform = [
             RandomResizedCropVideo(
