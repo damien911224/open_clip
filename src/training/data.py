@@ -76,6 +76,7 @@ class CsvVideoDataset(Dataset):
         vr = VideoReader(os.path.join(self.dataset_root_folder, self.page_dirs[idx], str(self.videos[idx]) + ".mp4"))
         frame_length = len(vr)
         frames = vr.get_batch(np.linspace(0, frame_length - 1, self.max_seq_len, dtype=np.int32)).asnumpy()
+        print(frames.shape)
         frames = Image.fromarray(frames)
 
         images = self.transforms(frames)
