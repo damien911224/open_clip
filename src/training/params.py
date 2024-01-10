@@ -78,6 +78,12 @@ def parse_args(args):
         help="Which type of data to process."
     )
     parser.add_argument(
+        "--max-seq-len",
+        type=int,
+        default=16,
+        help="The maximum number of frames for processing videos."
+    )
+    parser.add_argument(
         "--dataset-resampled",
         default=False,
         action="store_true",
