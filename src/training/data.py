@@ -55,7 +55,6 @@ class CsvVideoDataset(Dataset):
                  vid_key="videoid", caption_key="name", sep=",",
                  tokenizer=None, frame_len=768):
         logging.debug(f'Loading csv data from {input_filename}.')
-        print(input_filename)
         df = pd.read_csv(input_filename, sep=sep)
 
         self.videos = df[vid_key].tolist()
