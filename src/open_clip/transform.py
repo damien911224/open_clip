@@ -427,16 +427,17 @@ def video_transform(
         aug_cfg = aug_cfg or AugmentationCfg()
 
     normalize = NormalizeVideo(mean=mean, std=std)
+    if not isinstance(image_size, (tuple, list)):
+        image_size = (image_size, image_size)
 
     if is_train:
-        if not isinstance(image_size, (tuple, list)):
-            image_size = (image_size, image_size)
         aug_cfg_dict = {k: v for k, v in asdict(aug_cfg).items() if v is not None}
         train_transform = [
             RandomResizedCropVideo(
                 image_size[0],
                 image_size[1],
                 scale=aug_cfg_dict.pop('scale'),
+                aspect_ratio=(0.75, 1.3333333333333333),
                 interpolation=interpolation_mode,
             )
         ]
@@ -450,8 +451,6 @@ def video_transform(
         return train_transform
     else:
         assert resize_mode == 'shortest'
-        if not isinstance(image_size, (tuple, list)):
-            image_size = (image_size, image_size)
         transforms = [
             ShortSideScale(min(image_size)),
             CenterCropVideo(min(image_size)),
