@@ -314,6 +314,7 @@ class CLIP(nn.Module):
         image_features = torch.cat((image_features + pos_embeds, embedding_token), dim=1)
 
         image_features = self.aggregation_layer(image_features)[:, -1]
+        print(image_features.shape)
         image_features = F.normalize(image_features, dim=-1)
 
         text_features = self.encode_text(text, normalize=True) if text is not None else None
