@@ -67,7 +67,7 @@ class CsvVideoDataset(Dataset):
                 to_be_removed.append(i)
             else:
                 try:
-                    vr = VideoReader(video_path)
+                    VideoReader(video_path)
                 except RuntimeError:
                     to_be_removed.append(i)
         
