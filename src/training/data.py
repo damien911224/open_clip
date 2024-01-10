@@ -59,6 +59,15 @@ class CsvVideoDataset(Dataset):
         logging.debug(f'Loading csv data from {input_filename}.')
         df = pd.read_csv(input_filename, sep=sep)
 
+        to_be_removed = list()
+        for i, pd_item in enumerate(df):
+            if not os.path.exsits(
+                    os.path.join(dataset_root_folder, pd_item["page_dir"], pd_item[img_key] + ".mp4")):
+                to_be_removed.append(i)
+
+        print(len(to_be_removed))
+        df.drop(index=to_be_removed)
+
         self.videos = df[img_key].tolist()
         self.captions = df[caption_key].tolist()
         self.transforms = transforms
