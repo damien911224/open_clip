@@ -366,7 +366,7 @@ def create_loss(args):
 
 def create_model_and_transforms(
         model_name: str,
-        data_type: Optinal[str] = "images",
+        data_type: Optional[str] = "images",
         pretrained: Optional[str] = None,
         precision: str = 'fp32',
         device: Union[str, torch.device] = 'cpu',
