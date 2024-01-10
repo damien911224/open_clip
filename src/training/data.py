@@ -65,11 +65,6 @@ class CsvVideoDataset(Dataset):
                                                      str(pd_item[img_key]) + ".mp4"))
             if not os.path.exists(video_path):
                 to_be_removed.append(i)
-            else:
-                try:
-                    VideoReader(video_path)
-                except decord._ffi.base.DECORDError:
-                    to_be_removed.append(i)
         
         df = df.drop(to_be_removed)
 
