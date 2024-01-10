@@ -391,8 +391,8 @@ def create_model_and_transforms(
 
     model = create_model(
         model_name,
-        pretrained=pretrained,
         data_type=data_type,
+        pretrained=pretrained,
         precision=precision,
         device=device,
         jit=jit,

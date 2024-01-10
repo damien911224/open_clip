@@ -9,7 +9,10 @@ import torchvision
 import torchvision.transforms.functional as F
 from torchvision.transforms import Normalize, Compose, RandomResizedCrop, InterpolationMode, ToTensor, Resize, \
     CenterCrop, ColorJitter, Grayscale
-import pytorchvideo
+from pytorchvideo.transforms import Normalize as NormalizeVideo
+from pytorchvideo.transforms import RandomResizedCrop as RandomResizedCropVideo
+from pytorchvideo.transforms import Div255, ShortSideScale
+from torchvision.transforms._transforms_video import CenterCropVideo
 
 from .constants import OPENAI_DATASET_MEAN, OPENAI_DATASET_STD
 from .utils import to_2tuple
@@ -423,12 +426,12 @@ def video_transform(
     else:
         aug_cfg = aug_cfg or AugmentationCfg()
 
-    normalize = pytorchvideo.transforms.Normalize(mean=mean, std=std)
+    normalize = NormalizeVideo(mean=mean, std=std)
 
     if is_train:
         aug_cfg_dict = {k: v for k, v in asdict(aug_cfg).items() if v is not None}
         train_transform = [
-            pytorchvideo.transforms.RandomResizedCrop(
+            RandomResizedCropVideo(
                 image_size[0],
                 image_size[1],
                 scale=aug_cfg_dict.pop('scale'),
@@ -436,7 +439,7 @@ def video_transform(
             )
         ]
         train_transform.extend([
-            pytorchvideo.transforms.Div255(),
+            Div255(),
             normalize,
         ])
         train_transform = Compose(train_transform)
@@ -448,9 +451,9 @@ def video_transform(
         if not isinstance(image_size, (tuple, list)):
             image_size = (image_size, image_size)
         transforms = [
-            pytorchvideo.transforms.ShortSideScale(min(image_size)),
-            torchvision.transforms._transforms_video.CenterCropVideo(min(image_size)),
-            pytorchvideo.transforms.Div255(),
+            ShortSideScale(min(image_size)),
+            CenterCropVideo(min(image_size)),
+            Div255(),
             normalize,
         ]
 
