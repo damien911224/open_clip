@@ -513,7 +513,7 @@ def get_csv_video_dataset(args, preprocess_fn, is_train, epoch=0, tokenizer=None
         input_filename,
         preprocess_fn,
         args.dataset_root_folder,
-        img_key=args.csv_vid_key,
+        img_key=args.csv_img_key,
         caption_key=args.csv_caption_key,
         tokenizer=tokenizer,
         max_seq_len=args.max_seq_len
