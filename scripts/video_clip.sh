@@ -18,6 +18,8 @@ torchrun --nproc_per_node=4 \
     --warmup 10000 \
     --train-num-samples 829298 \
     --dataset-type csv_video \
+    --data-type "videos" \
     --batch-size 32 \
+    --max-seq-len 16 \
     --precision amp \
     --workers 16
