@@ -512,11 +512,21 @@ class CustomTextCLIP(nn.Module):
 
 
 class VideoCLIP(CLIP):
+    output_dict: torch.jit.Final[bool]
     def __init__(
             self,
+            embed_dim: int,
+            vision_cfg: CLIPVisionCfg,
+            text_cfg: CLIPTextCfg,
+            quick_gelu: bool = False,
+            init_logit_scale: float = np.log(1 / 0.07),
+            init_logit_bias: Optional[float] = None,
+            cast_dtype: Optional[torch.dtype] = None,
+            output_dict: bool = False,
             max_seq_len: int = 16,
     ):
-        super().__init__()
+        super().__init__(embed_dim, vision_cfg, text_cfg, quick_gelu,
+                         init_logit_scale, init_logit_bias, cast_dtype, output_dict)
         self.aggregation_layer = nn.TransformerEncoderLayer(d_model=embed_dim, nhead=8)
         self.embedding_token = nn.Parameter(torch.empty(1, embed_dim))
         self.temporal_positional_embedding = nn.Parameter(torch.empty(max_seq_len, embed_dim))
