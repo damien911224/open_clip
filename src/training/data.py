@@ -9,6 +9,7 @@ import braceexpand
 from dataclasses import dataclass
 from multiprocessing import Value
 
+import decord
 from decord import VideoReader
 from decord import cpu, gpu
 decord.bridge.set_bridge('torch')
