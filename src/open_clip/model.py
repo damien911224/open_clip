@@ -531,6 +531,10 @@ class VideoCLIP(CLIP):
         self.aggregation_layer = nn.TransformerEncoderLayer(d_model=embed_dim, nhead=8)
         self.embedding_token = nn.Parameter(torch.empty(1, embed_dim))
         self.temporal_positional_embedding = nn.Parameter(torch.empty(max_seq_len, embed_dim))
+        self.init_parameters()
+
+    def init_parameters(self):
+        nn.init.normal_(self.embedding_token.weight, std=0.02)
         nn.init.normal_(self.temporal_positional_embedding, std=0.01)
 
     def forward(
