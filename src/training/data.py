@@ -68,7 +68,7 @@ class CsvVideoDataset(Dataset):
             else:
                 try:
                     VideoReader(video_path)
-                except RuntimeError:
+                except decord._ffi.base.DECORDError:
                     to_be_removed.append(i)
         
         df = df.drop(to_be_removed)
