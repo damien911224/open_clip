@@ -19,7 +19,7 @@ except ImportError:
     wandb = None
 
 try:
-    import torch.utils.tensorboard as tensorboard
+    import tensorboardX as tensorboard
 except ImportError:
     tensorboard = None
 
