@@ -498,6 +498,7 @@ class VideoCLIP(nn.Module):
 
         print(image_features.shape)
         print(text_features.shape)
+        exit()
 
         if self.output_dict:
             out_dict = {
