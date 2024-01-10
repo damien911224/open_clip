@@ -403,7 +403,7 @@ class VideoCLIP(nn.Module):
             embed_dim: int,
             vision_cfg: CLIPVisionCfg,
             text_cfg: CLIPTextCfg,
-            temporal_len: int = 768,
+            max_seq_len: int = 768,
             quick_gelu: bool = False,
             init_logit_scale: float = np.log(1 / 0.07),
             init_logit_bias: Optional[float] = None,
@@ -427,7 +427,7 @@ class VideoCLIP(nn.Module):
         self.register_buffer('attn_mask', text.attn_mask, persistent=False)
         self.aggregation_layer = nn.TransformerEncoderLayer(d_model=embed_dim, nhead=8)
         self.embedding_token = nn.Parameter(torch.empty(1, embed_dim))
-        self.temporal_positional_embedding = nn.Parameter(torch.empty(768, embed_dim))
+        self.temporal_positional_embedding = nn.Parameter(torch.empty(max_seq_len, embed_dim))
         nn.init.normal_(self.temporal_positional_embedding, std=0.01)
 
         self.logit_scale = nn.Parameter(torch.ones([]) * init_logit_scale)
