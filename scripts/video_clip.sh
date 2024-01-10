@@ -24,6 +24,6 @@ torchrun --nproc_per_node=4 \
     --batch-size 32 \
     --max-seq-len 16 \
     --precision amp \
-    --workers 16 \
-    --local-loss \
-    --gather-with-grad
+    --workers 16
+#    --local-loss \
+#    --gather-with-grad
