@@ -593,7 +593,7 @@ def get_dataset_fn(data_path, dataset_type):
     elif dataset_type == "csv":
         return get_csv_dataset
     elif dataset_type == "csv_video":
-        return get_csv_video_dataset()
+        return get_csv_video_dataset
     elif dataset_type == "synthetic":
         return get_synthetic_dataset
     elif dataset_type == "auto":
