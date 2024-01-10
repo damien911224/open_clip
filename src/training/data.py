@@ -55,7 +55,7 @@ class CsvDataset(Dataset):
 class CsvVideoDataset(Dataset):
     def __init__(self, input_filename, transforms, dataset_root_folder,
                  vid_key="videoid", caption_key="name", sep=",",
-                 tokenizer=None, frame_len=768):
+                 tokenizer=None, frame_len=16):
         logging.debug(f'Loading csv data from {input_filename}.')
         df = pd.read_csv(input_filename, sep=sep)
 
