@@ -527,6 +527,7 @@ class VideoCLIP(CLIP):
     ):
         super().__init__(embed_dim, vision_cfg, text_cfg, quick_gelu,
                          init_logit_scale, init_logit_bias, cast_dtype, output_dict)
+
         self.aggregation_layer = nn.TransformerEncoderLayer(d_model=embed_dim, nhead=8)
         self.embedding_token = nn.Parameter(torch.empty(1, embed_dim))
         self.temporal_positional_embedding = nn.Parameter(torch.empty(max_seq_len, embed_dim))
@@ -539,7 +540,7 @@ class VideoCLIP(CLIP):
     ):
         N, C, T, H, W = image.shape
         image = image.transpose(1, 2).flatten(0, 1)
-        image_features = self.encode_image(image, normalize=False) if video is not None else None
+        image_features = self.encode_image(image, normalize=False) if image is not None else None
         image_features = image_features.view(N, T, -1)
 
         pos_embeds = self.temporal_positional_embedding.unsqueeze(0)
