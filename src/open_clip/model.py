@@ -534,7 +534,7 @@ class VideoCLIP(CLIP):
         self.init_parameters()
 
     def init_parameters(self):
-        nn.init.normal_(self.embedding_token.weight, std=0.02)
+        nn.init.normal_(self.embedding_token, std=0.02)
         nn.init.normal_(self.temporal_positional_embedding, std=0.01)
 
     def forward(
