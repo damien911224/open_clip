@@ -483,7 +483,7 @@ class VideoCLIP(nn.Module):
             text: Optional[torch.Tensor] = None,
     ):
         N, C, T, H, W = video.shape
-        video = video.transpose(1, 2).view(N * T, C, H, W)
+        video = video.transpose(1, 2).flatten(0, 1)
         image_features = self.encode_image(video, normalize=False) if video is not None else None
         print(image_features.shape)
         exit()
