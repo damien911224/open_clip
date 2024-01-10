@@ -15,7 +15,7 @@ master_addr=$(scontrol show hostnames "$SLURM_JOB_NODELIST" | head -n 1)
 export MASTER_ADDR=$master_addr
 
 export PYTHONPATH="$PYTHONPATH:$PWD/src"
-srun --cpu_bind=v --accel-bind=gn python -u src/training/main.py \
+srun --cpu_bind=v --accel-bind=gn python -u ../src/training/main.py \
     --save-frequency 1 \
     --report-to tensorboard \
     --train-data="/mnt/hdd0/webvid/results_2M_train_3/0.csv" \
