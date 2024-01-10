@@ -13,7 +13,7 @@ torchrun --nproc_per_node=4 \
     --csv-img-key videoid \
     --csv-caption-key name \
     --model RN50 \
-    --name "Video-CLIP"
+    --name "Video-CLIP" \
     --lr=1e-3 \
     --wd=0.1 \
     --epochs=30 \
