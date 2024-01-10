@@ -7,6 +7,7 @@ torchrun --nproc_per_node=4 \
     --rdzv_endpoint=$HOSTE_NODE_ADDR \
     -m training.main \
     --report-to tensorboard \
+    --dataset-root-folder="/mnt/hdd0/webvid/data/videos"
     --train-data="/mnt/hdd0/webvid/results_2M_train_3/0.csv" \
     --val-data="/mnt/hdd0/webvid/results_2M_val_1/0.csv" \
     --csv-img-key videoid \
