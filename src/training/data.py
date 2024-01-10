@@ -65,7 +65,6 @@ class CsvVideoDataset(Dataset):
                                                str(pd_item[img_key]) + ".mp4")):
                 to_be_removed.append(i)
 
-        print(len(to_be_removed))
         df.drop(index=to_be_removed)
 
         self.videos = df[img_key].tolist()
