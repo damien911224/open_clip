@@ -87,7 +87,15 @@ class CsvVideoDataset(Dataset):
         return len(self.captions)
 
     def __getitem__(self, idx):
-        vr = VideoReader(os.path.join(self.dataset_root_folder, self.page_dirs[idx], str(self.videos[idx]) + ".mp4"))
+        video_path = os.path.join(self.dataset_root_folder, self.page_dirs[idx], str(self.videos[idx]) + ".mp4")
+        while True:
+            try:
+                vr = VideoReader(video_path)
+                break
+            except decord._ffi.base.DECORDError:
+                idx = random.choice(range(self.__len__()))
+                video_path = os.path.join(self.dataset_root_folder, self.page_dirs[idx], str(self.videos[idx]) + ".mp4")
+
         frame_length = len(vr)
         frames = vr.get_batch(np.linspace(0, frame_length - 1, self.max_seq_len, dtype=np.int32)).permute(3, 0, 1, 2)
         images = self.transforms(frames)
