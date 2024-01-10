@@ -25,4 +25,5 @@ torchrun --nproc_per_node=4 \
     --precision amp \
     --workers 16
 #    --local-loss \
+#    --train-num-samples 829103 \
 #    --gather-with-grad
