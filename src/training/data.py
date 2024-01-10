@@ -66,7 +66,7 @@ class CsvVideoDataset(Dataset):
                 to_be_removed.append(i)
         print(len(df))
         print(len(to_be_removed))
-        df.drop(to_be_removed)
+        df = df.drop(to_be_removed)
         print(len(df))
         exit()
 
