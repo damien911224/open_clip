@@ -61,9 +61,15 @@ class CsvVideoDataset(Dataset):
 
         to_be_removed = list()
         for i, pd_item in df.iterrows():
-            if not os.path.exists(os.path.join(dataset_root_folder, str(pd_item["page_dir"]),
-                                               str(pd_item[img_key]) + ".mp4")):
+            video_path = os.path.exists(os.path.join(dataset_root_folder, str(pd_item["page_dir"]),
+                                                     str(pd_item[img_key]) + ".mp4"))
+            if not os.path.exists(video_path):
                 to_be_removed.append(i)
+            else:
+                try:
+                    vr = VideoReader(video_path)
+                except RuntimeError:
+                    to_be_removed.append(i)
         
         df = df.drop(to_be_removed)
 
