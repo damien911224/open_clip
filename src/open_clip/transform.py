@@ -434,7 +434,6 @@ def video_transform(
         aug_cfg_dict = {k: v for k, v in asdict(aug_cfg).items() if v is not None}
         train_transform = [
             ConvertUint8ToFloat(),
-            # Div255(),
             RandomResizedCropVideo(
                 image_size[0],
                 image_size[1],
@@ -443,9 +442,9 @@ def video_transform(
                 interpolation=interpolation_mode,
             )
         ]
-        # train_transform.extend([
-        #     normalize,
-        # ])
+        train_transform.extend([
+            normalize,
+        ])
         train_transform = Compose(train_transform)
         if aug_cfg_dict:
             warnings.warn(f'Unused augmentation cfg items, specify `use_timm` to use ({list(aug_cfg_dict.keys())}).')
@@ -454,7 +453,6 @@ def video_transform(
         assert resize_mode == 'shortest'
         transforms = [
             ConvertUint8ToFloat(),
-            Div255(),
             ShortSideScale(min(image_size)),
             CenterCropVideo(min(image_size)),
             normalize,
