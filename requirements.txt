@@ -8,3 +8,4 @@ sentencepiece
 protobuf
 timm
 pytorchvideo
+decord
