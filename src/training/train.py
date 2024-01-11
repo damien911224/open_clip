@@ -92,6 +92,13 @@ def train_one_epoch(model, data, loss, epoch, optimizer, scaler, scheduler, dist
 
         images, texts = batch
 
+        print(texts[0])
+        frames = (images[0].permute(1, 2, 3, 0) * 255.0).numpy().astype(np.uint8)
+        for f_i, frame in enumerate(frames):
+            frame = frame[:, :, ::-1]
+            cv2.imwrite("/mnt/hdd0/frame_{:05d}.jpg".format(f_i + 1), frame)
+        exit()
+
         images = images.to(device=device, dtype=input_dtype, non_blocking=True)
         texts = texts.to(device=device, non_blocking=True)
 
