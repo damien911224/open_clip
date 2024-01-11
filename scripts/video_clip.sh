@@ -1,9 +1,9 @@
 #!/bin/bash
 
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+export CUDA_VISIBLE_DEVICES=0,1,2
 
 cd ../src
-torchrun --nproc_per_node=4 \
+torchrun --nproc_per_node=3 \
     --rdzv_endpoint=$HOSTE_NODE_ADDR \
     -m training.main \
     --report-to tensorboard \
@@ -21,10 +21,10 @@ torchrun --nproc_per_node=4 \
     --warmup 10000 \
     --dataset-type csv_video \
     --data-type "videos" \
-    --batch-size 16 \
+    --batch-size 24 \
     --max-seq-len 16 \
     --precision amp \
-    --workers 16
+    --workers 24
 #    --local-loss \
 #    --train-num-samples 829103 \
 #    --gather-with-grad
