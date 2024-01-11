@@ -434,7 +434,7 @@ def video_transform(
         aug_cfg_dict = {k: v for k, v in asdict(aug_cfg).items() if v is not None}
         train_transform = [
             ConvertUint8ToFloat(),
-            Div255(),
+            # Div255(),
             RandomResizedCropVideo(
                 image_size[0],
                 image_size[1],
