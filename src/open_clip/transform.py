@@ -435,22 +435,17 @@ def video_transform(
 
         train_transform = [
             ConvertUint8ToFloat(),
-            ShortSideScale(min(image_size)),
-            CenterCropVideo(min(image_size)),
+            RandomResizedCropVideo(
+                image_size[0],
+                image_size[1],
+                scale=aug_cfg_dict.pop('scale'),
+                aspect_ratio=(0.75, 1.3333333333333333),
+                interpolation=interpolation_mode,
+            )
         ]
-        # train_transform = [
-        #     ConvertUint8ToFloat(),
-        #     RandomResizedCropVideo(
-        #         image_size[0],
-        #         image_size[1],
-        #         scale=aug_cfg_dict.pop('scale'),
-        #         aspect_ratio=(0.75, 1.3333333333333333),
-        #         interpolation=interpolation_mode,
-        #     )
-        # ]
-        # train_transform.extend([
-        #     normalize,
-        # ])
+        train_transform.extend([
+            normalize,
+        ])
         train_transform = Compose(train_transform)
         if aug_cfg_dict:
             warnings.warn(f'Unused augmentation cfg items, specify `use_timm` to use ({list(aug_cfg_dict.keys())}).')
