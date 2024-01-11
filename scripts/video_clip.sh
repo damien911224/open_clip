@@ -3,7 +3,7 @@
 export CUDA_VISIBLE_DEVICES=0,1,2
 
 cd ../src
-torchrun --nproc_per_node=4 \
+torchrun --nproc_per_node=3 \
     --rdzv_endpoint=$HOSTE_NODE_ADDR \
     -m training.main \
     --report-to tensorboard \
