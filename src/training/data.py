@@ -93,6 +93,7 @@ class CsvVideoDataset(Dataset):
                 idx = random.choice(range(self.__len__()))
                 video_path = os.path.join(self.dataset_root_folder, self.page_dirs[idx], str(self.videos[idx]) + ".mp4")
 
+        print(frame_length)
         images = self.transforms(frames)
         texts = self.tokenize([str(self.captions[idx])])[0]
         return images, texts
