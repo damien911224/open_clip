@@ -18,7 +18,7 @@ torchrun --nproc_per_node=3 \
     --wd=0.1 \
     --epochs=30 \
     --seed 0 \
-    --warmup 10000 \
+    --warmup 2000 \
     --dataset-type csv_video \
     --data-type "videos" \
     --batch-size 16 \
