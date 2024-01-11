@@ -21,10 +21,10 @@ torchrun --nproc_per_node=4 \
     --warmup 10000 \
     --dataset-type csv_video \
     --data-type "videos" \
-    --batch-size 16 \
+    --batch-size 24 \
     --max-seq-len 16 \
     --precision amp \
-    --workers 16
+    --workers 24
 #    --local-loss \
 #    --train-num-samples 829103 \
 #    --gather-with-grad
