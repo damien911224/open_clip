@@ -16,9 +16,9 @@ torchrun --nproc_per_node=3 \
     --name "Video-CLIP" \
     --lr=1e-4 \
     --wd=0.1 \
-    --epochs=30 \
+    --epochs=20 \
     --seed 0 \
-    --warmup 2000 \
+    --warmup 5000 \
     --dataset-type csv_video \
     --data-type "videos" \
     --batch-size 16 \
