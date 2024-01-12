@@ -25,7 +25,7 @@ torchrun --nproc_per_node=3 \
     --data-type "videos" \
     --batch-size 16 \
     --max-seq-len 8 \
-    --workers 16
+    --workers 16 \
     --precision float32 \
 #    --local-loss \
 #    --train-num-samples 829103 \
