@@ -26,7 +26,7 @@ torchrun --nproc_per_node=3 \
     --batch-size 16 \
     --max-seq-len 8 \
     --workers 16 \
-    --precision fp32 \
+    --precision fp32
 #    --local-loss \
 #    --train-num-samples 829103 \
 #    --gather-with-grad
