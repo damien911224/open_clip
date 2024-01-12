@@ -17,12 +17,13 @@ torchrun --nproc_per_node=3 \
     --name "Video-CLIP" \
     --lr=1e-3 \
     --wd=0.1 \
+    --eps=1e-8 \
     --epochs=30 \
     --seed 0 \
     --warmup 2000 \
     --dataset-type csv_video \
     --data-type "videos" \
-    --batch-size 32 \
+    --batch-size 16 \
     --max-seq-len 8 \
     --workers 16
 #    --precision amp \
