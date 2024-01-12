@@ -12,19 +12,19 @@ torchrun --nproc_per_node=3 \
     --val-data="/mnt/hdd0/webvid/results_2M_val_1/0.csv" \
     --csv-img-key videoid \
     --csv-caption-key name \
+    --train-num-samples 200000 \
     --model RN50 \
     --name "Video-CLIP" \
-    --lr=1e-4 \
-    --wd=0.1 \
-    --epochs=20 \
+    --lr=1e-3 \
+    --epochs=30 \
     --seed 0 \
-    --warmup 5000 \
+    --warmup 2000 \
     --dataset-type csv_video \
     --data-type "videos" \
     --batch-size 16 \
     --max-seq-len 16 \
-    --precision amp \
     --workers 16
+#    --precision amp \
 #    --local-loss \
 #    --train-num-samples 829103 \
 #    --gather-with-grad
