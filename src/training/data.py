@@ -55,7 +55,7 @@ class CsvDataset(Dataset):
 class CsvVideoDataset(Dataset):
     def __init__(self, input_filename, transforms, dataset_root_folder,
                  img_key="videoid", caption_key="name", sep=",",
-                 tokenizer=None, max_seq_len=16):
+                 tokenizer=None, max_seq_len=16, num_samples=None):
         logging.debug(f'Loading csv data from {input_filename}.')
         df = pd.read_csv(input_filename, sep=sep)
 
@@ -67,6 +67,9 @@ class CsvVideoDataset(Dataset):
                 to_be_removed.append(i)
         
         df = df.drop(to_be_removed)
+
+        if num_samples is not None:
+            df = df.sample(n=num_samples)
 
         self.videos = df[img_key].tolist()
         self.captions = df[caption_key].tolist()
@@ -534,7 +537,8 @@ def get_csv_video_dataset(args, preprocess_fn, is_train, epoch=0, tokenizer=None
         img_key=args.csv_img_key,
         caption_key=args.csv_caption_key,
         tokenizer=tokenizer,
-        max_seq_len=args.max_seq_len
+        max_seq_len=args.max_seq_len,
+        num_samples=args.train_num_samples,
     )
     num_samples = len(dataset)
     sampler = DistributedSampler(dataset) if args.distributed and is_train else None
