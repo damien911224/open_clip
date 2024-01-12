@@ -538,7 +538,7 @@ def get_csv_video_dataset(args, preprocess_fn, is_train, epoch=0, tokenizer=None
         caption_key=args.csv_caption_key,
         tokenizer=tokenizer,
         max_seq_len=args.max_seq_len,
-        num_samples=args.train_num_samples if is_train else None,
+        num_samples=args.train_num_samples if is_train else args.val_num_samples,
     )
     num_samples = len(dataset)
     sampler = DistributedSampler(dataset) if args.distributed and is_train else None
