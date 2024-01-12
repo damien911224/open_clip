@@ -22,9 +22,9 @@ torchrun --nproc_per_node=3 \
     --warmup 2000 \
     --dataset-type csv_video \
     --data-type "videos" \
-    --batch-size 16 \
-    --max-seq-len 16 \
-    --workers 16
+    --batch-size 32 \
+    --max-seq-len 8 \
+    --workers 24
 #    --precision amp \
 #    --local-loss \
 #    --train-num-samples 829103 \
