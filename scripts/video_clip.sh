@@ -15,7 +15,7 @@ torchrun --nproc_per_node=3 \
     --train-num-samples 200000 \
     --model RN50 \
     --name "Video-CLIP" \
-    --lr=1e-4 \
+    --lr=1e-5 \
     --wd=0.1 \
     --epochs=30 \
     --seed 0 \
