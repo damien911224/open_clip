@@ -17,7 +17,6 @@ torchrun --nproc_per_node=3 \
     --name "Video-CLIP" \
     --lr=1e-4 \
     --wd=0.1 \
-    --eps=1e-8 \
     --epochs=30 \
     --seed 0 \
     --warmup 2000 \
