@@ -16,7 +16,7 @@ torchrun --nproc_per_node=3 \
     --model RN50 \
     --name "Video-CLIP" \
     --lr=1e-3 \
-    --wd=1e-4 \
+    --wd=0.1 \
     --epochs=30 \
     --seed 0 \
     --warmup 2000 \
