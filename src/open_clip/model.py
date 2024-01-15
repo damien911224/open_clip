@@ -395,122 +395,6 @@ class CustomTextCLIP(nn.Module):
         return image_features, text_features, self.logit_scale.exp()
 
 
-# class VideoCLIP(nn.Module):
-#     output_dict: torch.jit.Final[bool]
-#
-#     def __init__(
-#             self,
-#             embed_dim: int,
-#             vision_cfg: CLIPVisionCfg,
-#             text_cfg: CLIPTextCfg,
-#             max_seq_len: int = 16,
-#             quick_gelu: bool = False,
-#             init_logit_scale: float = np.log(1 / 0.07),
-#             init_logit_bias: Optional[float] = None,
-#             cast_dtype: Optional[torch.dtype] = None,
-#             output_dict: bool = False,
-#     ):
-#         super().__init__()
-#         self.output_dict = output_dict
-#
-#         self.visual = _build_vision_tower(embed_dim, vision_cfg, quick_gelu, cast_dtype)
-#
-#         text = _build_text_tower(embed_dim, text_cfg, quick_gelu, cast_dtype)
-#         self.transformer = text.transformer
-#         self.context_length = text.context_length
-#         self.vocab_size = text.vocab_size
-#         self.token_embedding = text.token_embedding
-#         self.positional_embedding = text.positional_embedding
-#         self.ln_final = text.ln_final
-#         self.text_projection = text.text_projection
-#         self.text_pool_type = text.pool_type
-#         self.register_buffer('attn_mask', text.attn_mask, persistent=False)
-#         self.aggregation_layer = nn.TransformerEncoderLayer(d_model=embed_dim, nhead=8)
-#         self.embedding_token = nn.Parameter(torch.empty(1, embed_dim))
-#         self.temporal_positional_embedding = nn.Parameter(torch.empty(max_seq_len, embed_dim))
-#         nn.init.normal_(self.temporal_positional_embedding, std=0.01)
-#
-#         self.logit_scale = nn.Parameter(torch.ones([]) * init_logit_scale)
-#         if init_logit_bias is not None:
-#             self.logit_bias = nn.Parameter(torch.ones([]) * init_logit_bias)
-#         else:
-#             self.logit_bias = None
-#
-#     def lock_image_tower(self, unlocked_groups=0, freeze_bn_stats=False):
-#         # lock image tower as per LiT - https://arxiv.org/abs/2111.07991
-#         self.visual.lock(unlocked_groups=unlocked_groups, freeze_bn_stats=freeze_bn_stats)
-#
-#     @torch.jit.ignore
-#     def set_grad_checkpointing(self, enable=True):
-#         self.visual.set_grad_checkpointing(enable)
-#         self.transformer.grad_checkpointing = enable
-#
-#     def encode_video(self, video, normalize: bool = False):
-#         features = self.visual(video)
-#         return F.normalize(features, dim=-1) if normalize else features
-#
-#     def encode_text(self, text, normalize: bool = False):
-#         cast_dtype = self.transformer.get_cast_dtype()
-#
-#         x = self.token_embedding(text).to(cast_dtype)  # [batch_size, n_ctx, d_model]
-#
-#         x = x + self.positional_embedding.to(cast_dtype)
-#         x = x.permute(1, 0, 2)  # NLD -> LND
-#         x = self.transformer(x, attn_mask=self.attn_mask)
-#         x = x.permute(1, 0, 2)  # LND -> NLD
-#         x = self.ln_final(x)  # [batch_size, n_ctx, transformer.width]
-#         x, _ = text_global_pool(x, text, self.text_pool_type)
-#         if self.text_projection is not None:
-#             if isinstance(self.text_projection, nn.Linear):
-#                 x = self.text_projection(x)
-#             else:
-#                 x = x @ self.text_projection
-#
-#         return F.normalize(x, dim=-1) if normalize else x
-#
-#     def get_logits(self, image, text):
-#         image_features = self.encode_image(image, normalize=True)
-#         text_features = self.encode_text(text, normalize=True)
-#         image_logits = self.logit_scale.exp() * image_features @ text_features.T
-#         if self.logit_bias is not None:
-#             image_logits += self.logit_bias
-#         text_logits = image_logits.T
-#         return image_logits, text_logits
-#
-#     def forward(
-#             self,
-#             video: Optional[torch.Tensor] = None,
-#             text: Optional[torch.Tensor] = None,
-#     ):
-#         N, C, T, H, W = video.shape
-#         video = video.transpose(1, 2).flatten(0, 1)
-#         image_features = self.encode_video(video, normalize=False) if video is not None else None
-#         image_features = image_features.view(N, T, -1)
-#
-#         pos_embeds = self.temporal_positional_embedding.unsqueeze(0)
-#         embedding_token = self.embedding_token.unsqueeze(0).repeat(N, 1, 1)
-#         image_features = torch.cat((image_features + pos_embeds, embedding_token), dim=1)
-#
-#         image_features = self.aggregation_layer(image_features.transpose(0, 1))[0]
-#         image_features = F.normalize(image_features, dim=-1)
-#
-#         text_features = self.encode_text(text, normalize=True) if text is not None else None
-#
-#         if self.output_dict:
-#             out_dict = {
-#                 "image_features": image_features,
-#                 "text_features": text_features,
-#                 "logit_scale": self.logit_scale.exp()
-#             }
-#             if self.logit_bias is not None:
-#                 out_dict['logit_bias'] = self.logit_bias
-#             return out_dict
-#
-#         if self.logit_bias is not None:
-#             return image_features, text_features, self.logit_scale.exp(), self.logit_bias
-#         return image_features, text_features, self.logit_scale.exp()
-
-
 class VideoCLIP(CLIP):
     output_dict: torch.jit.Final[bool]
     def __init__(
@@ -525,12 +409,15 @@ class VideoCLIP(CLIP):
             output_dict: bool = False,
             max_seq_len: int = 16,
     ):
+        # CLIP init
         super().__init__(embed_dim, vision_cfg, text_cfg, quick_gelu,
                          init_logit_scale, init_logit_bias, cast_dtype, output_dict)
-
+        # temporal aggregation layer
         self.aggregation_layer = nn.TransformerEncoderLayer(d_model=embed_dim, nhead=8)
+        # token for summarizing temporal features
         self.embedding_token = nn.Parameter(torch.empty(1, embed_dim))
-        self.temporal_positional_embedding = nn.Parameter(torch.empty(max_seq_len, embed_dim))
+        # learnable position embeddings for temporal features
+        self.temporal_positional_embedding = nn.Parameter(torch.empty(max_seq_len, embed_dim)) # learnable
         self.init_parameters()
 
     def init_parameters(self):
@@ -543,15 +430,21 @@ class VideoCLIP(CLIP):
             text: Optional[torch.Tensor] = None,
     ):
         N, C, T, H, W = image.shape
+        # NxCxTxHxW -> NTxCxHxW for extracting features for each frame
         image = image.transpose(1, 2).flatten(0, 1)
+        # extract frame features
         image_features = self.encode_image(image, normalize=False) if image is not None else None
+        # NTxD -> NxTxD
         image_features = image_features.view(N, T, -1)
 
+        # TxD -> 1xTxD
         pos_embeds = self.temporal_positional_embedding.unsqueeze(0)
+        # 1xD -> Nx1xD
         embedding_token = self.embedding_token.unsqueeze(0).repeat(N, 1, 1)
+        # TxD -> (T+1)xD
         image_features = torch.cat((image_features + pos_embeds, embedding_token), dim=1)
-
-        image_features = self.aggregation_layer(image_features.transpose(0, 1))[0]
+        # temporal encoding and
+        image_features = self.aggregation_layer(image_features.transpose(0, 1))[-1]
         image_features = F.normalize(image_features, dim=-1)
 
         text_features = self.encode_text(text, normalize=True) if text is not None else None
