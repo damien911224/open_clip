@@ -1,6 +1,11 @@
 
 # Modified Files
 
+## training configuration
+
+    GPUS: NVIDIA A6000 x3
+    Num Samples: 100K (training) / 5K (validation)
+
 ## scripts/video_clip.sh
 
     New file for training video clip model
