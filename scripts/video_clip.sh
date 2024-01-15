@@ -14,7 +14,7 @@ torchrun --nproc_per_node=3 \
     --csv-caption-key name \
     --train-num-samples 200000 \
     --model RN50 \
-    --name "Video-CLIP" \
+    --name "Video-CLIP-02" \
     --lr=1e-5 \
     --wd=0.1 \
     --epochs=30 \
