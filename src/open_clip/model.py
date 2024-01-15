@@ -441,9 +441,9 @@ class VideoCLIP(CLIP):
         pos_embeds = self.temporal_positional_embedding.unsqueeze(0)
         # 1xD -> Nx1xD
         embedding_token = self.embedding_token.unsqueeze(0).repeat(N, 1, 1)
-        # TxD -> (T+1)xD
+        # NxTxD -> Nx(T+1)xD
         image_features = torch.cat((image_features + pos_embeds, embedding_token), dim=1)
-        # temporal encoding and take the token to summarize features
+        # NxTxD -> TxNxD -> NxD, temporal encoding and take the token to summarize features
         image_features = self.aggregation_layer(image_features.transpose(0, 1))[-1]
         # normalize features
         image_features = F.normalize(image_features, dim=-1)
