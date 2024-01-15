@@ -12,7 +12,7 @@ torchrun --nproc_per_node=3 \
     --val-data="/mnt/hdd0/webvid/results_2M_val_1/0.csv" \
     --csv-img-key videoid \
     --csv-caption-key name \
-    --train-num-samples 200000 \
+    --train-num-samples 100000 \
     --model RN50 \
     --name "Video-CLIP-02" \
     --lr=1e-5 \
