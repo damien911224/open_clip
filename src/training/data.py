@@ -59,27 +59,27 @@ class CsvVideoDataset(Dataset):
         logging.debug(f'Loading csv data from {input_filename}.')
         df = pd.read_csv(input_filename, sep=sep)
 
+        # data validation
         to_be_removed = list()
         for i, pd_item in df.iterrows():
             video_path = os.path.exists(os.path.join(dataset_root_folder, str(pd_item["page_dir"]),
                                                      str(pd_item[img_key]) + ".mp4"))
             if not os.path.exists(video_path):
                 to_be_removed.append(i)
-        
         df = df.drop(to_be_removed)
-
+        # data sampling when num_sample is specified
         if num_samples is not None:
             df = df.sample(n=num_samples)
 
         self.videos = df[img_key].tolist()
         self.captions = df[caption_key].tolist()
         self.transforms = transforms
-        logging.debug('Done loading data.')
-
         self.tokenize = tokenizer
-        self.page_dirs = df["page_dir"].tolist()
-        self.max_seq_len = max_seq_len
-        self.dataset_root_folder = dataset_root_folder
+        self.page_dirs = df["page_dir"].tolist() # containing sub-folder
+        self.max_seq_len = max_seq_len # maximum sequence length for videos
+        self.dataset_root_folder = dataset_root_folder # root folder for the dataset
+
+        logging.debug('Done loading data.')
 
     def __len__(self):
         return len(self.captions)
@@ -90,9 +90,11 @@ class CsvVideoDataset(Dataset):
             try:
                 vr = VideoReader(video_path)
                 frame_length = len(vr)
+                # sampling frames with the specified maximum sequence length (TxHxWx3 -> 3xTxHxW)
                 frames = vr.get_batch(np.linspace(0, frame_length - 1, self.max_seq_len, dtype=np.int32)).permute(3, 0, 1, 2)
                 break
             except:
+                # when we get a video decoding error, resample a video
                 idx = random.choice(range(self.__len__()))
                 video_path = os.path.join(self.dataset_root_folder, self.page_dirs[idx], str(self.videos[idx]) + ".mp4")
 

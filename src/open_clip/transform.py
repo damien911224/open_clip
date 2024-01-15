@@ -432,7 +432,7 @@ def video_transform(
 
     if is_train:
         aug_cfg_dict = {k: v for k, v in asdict(aug_cfg).items() if v is not None}
-
+        # here, we only use random resize crop for videos for augmentation
         train_transform = [
             ConvertUint8ToFloat(),
             RandomResizedCropVideo(
